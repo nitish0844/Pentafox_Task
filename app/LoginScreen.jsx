@@ -10,6 +10,7 @@ import {
   ScrollView,
   Image,
   Alert,
+  Modal,
 } from "react-native";
 import React, { useState } from "react";
 import {
@@ -28,6 +29,9 @@ const LoginScreen = ({}) => {
   const [password, setPassword] = useState("");
   const [passWordVisible, setPasswordVisible] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [forgetPasswordEmail, setForgetPasswordEmail] = useState("");
+  const [forgetPasswordError, setForgetPasswordError] = useState("");
 
   const validateEmail = (text) => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -69,6 +73,36 @@ const LoginScreen = ({}) => {
     }
 
     Alert.alert("Success", "Login successful!");
+  };
+
+  const forgetPassWord = () => {
+    setModalVisible(true);
+  };
+
+  const onForgetPasswordSubmit = (text) => {
+    if (text === "") {
+      Alert.alert("Error", "Please enter your email.");
+      return;
+    }
+
+    if (emailError) {
+      Alert.alert("Error", emailError);
+      return;
+    }
+
+    setModalVisible(text);
+    setModalVisible(false);
+  };
+
+  const forgetEmailText = (text) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (emailRegex.test(text)) {
+      setEmailError("");
+    } else {
+      setForgetPasswordError("Please enter a valid email address.");
+    }
+
+    setForgetPasswordEmail(text);
   };
 
   return (
@@ -140,7 +174,10 @@ const LoginScreen = ({}) => {
             </View>
           </View>
 
-          <TouchableOpacity style={{ marginTop: 20, alignSelf: "flex-end" }}>
+          <TouchableOpacity
+            style={{ marginTop: 20, alignSelf: "flex-end" }}
+            onPress={forgetPassWord}
+          >
             <Text style={{ color: "#050049", fontWeight: "600" }}>
               Forget Password?
             </Text>
@@ -188,6 +225,41 @@ const LoginScreen = ({}) => {
               </Text>
             </TouchableOpacity>
           </View>
+
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            style={Styles.modal}
+            onRequestClose={() => setModalVisible(!modalVisible)}
+          >
+            <View style={Styles.modalContent}>
+              <View style={Styles.modalView}>
+                <Text>Forget Password</Text>
+
+                <View style={Styles.inputContainerModal}>
+                  <TextInput
+                    placeholder="Enter Email"
+                    style={Styles.input}
+                    value={forgetPasswordEmail}
+                    onChangeText={forgetEmailText}
+                    autoCapitalize="none"
+                  />
+
+                  {forgetPasswordError && (
+                    <Text style={Styles.error}>{forgetPasswordError}</Text>
+                  )}
+
+                  <TouchableOpacity
+                    style={Styles.button}
+                    onPress={onForgetPasswordSubmit}
+                  >
+                    <Text style={Styles.buttonText}>Submit</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </ScrollView>
       </TouchableWithoutFeedback>
     </SafeAreaView>
@@ -243,6 +315,43 @@ const Styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  modal: {
+    margin: 0,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalView: {
+    width: "90%",
+    height: "40%",
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  inputContainer: {
+    width: "100%",
+    top: 20,
+  },
+  inputContainerModal: {
+    width: "100%",
+    top: 20,
+    alignItems: "center",
+    gap: 10,
   },
 });
 
